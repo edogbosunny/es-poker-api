@@ -1,0 +1,19 @@
+{
+  "name": "es-poker-api",
+  "version": "1.0.0",
+  "description": "A simple pocker system for agile methodology",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edogbosunny/es-poker-api.git"
+  },
+  "author": "Sunny",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/edogbosunny/es-poker-api/issues"
+  },
+  "homepage": "https://github.com/edogbosunny/es-poker-api#readme"
+}
