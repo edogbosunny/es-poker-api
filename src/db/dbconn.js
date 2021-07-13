@@ -5,7 +5,6 @@ const logger = require('../utils/logger');
 
 // Build the connection string
 
-
   const dbURI = process.env.MONGOCONN
 
   const options = {

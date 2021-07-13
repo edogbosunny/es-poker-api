@@ -1,6 +1,7 @@
 const Rooms = require('../models/rooms');
 const joi = require('joi');
 const { validateSpec } = require('../utils/spec-validator');
+const resultCodes = require('../helpers/result-codes')
 
 const createRoom = async (req, res) => {
   const soc = req.app.get('io')
@@ -23,28 +24,28 @@ const createRoom = async (req, res) => {
 
     const findRoom = await Rooms.find(
       { room: params.room, room_id: params.room_id })
+
     if (!findRoom || findRoom.length === 0) {
       sock.emit("err", "Room does not exist" + selectedRoom);
-      return res.status(400).json({ code: '01', message: String('Room does not exist.') })
+      return res.status(400).json({ code: resultCodes.error, message: 'Room does not exist.' })
     }
+
     const rooms = soc.nsps
- 
+
     if (!rooms) {
       sock.join(selectedRoom);
       sock.emit("success", "You have successful joined: " + selectedRoom);
     }
 
-    console.log("Joining Room...: " + selectedRoom);
-
     return {
-      code: '00',
+      code: resultCodes.success,
       message: 'meeting room joined.',
     }
-    // res.status(201).json()
+    
   } catch (e) {
 
     sock.emit("err", "An error occoured while joining the room " + selectedRoom);
-    res.status(400).json({ code: '01', message: String(e.message) })
+    res.status(400).json({ code: resultCodes.error, message: e.message })
   }
 }
 module.exports = createRoom;

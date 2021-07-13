@@ -1,5 +1,6 @@
+const resultCode = require('../helpers/result-codes')
 const notFound = (req, res) => res.status.json({
-  code: 2,
+  code: resultCode.error,
   msg: 'Not Found',
 });
 

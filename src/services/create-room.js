@@ -1,10 +1,11 @@
 const Rooms = require('../models/rooms');
 const joi = require('joi');
 const { validateSpec } = require('../utils/spec-validator');
+const responseCodes = require('../helpers/result-codes')
 
 const createRoom = async (req, res) => {
 
-  const sock = req.app.get('sock')
+  const sock = req.app.get('sock');
   let selectedRoom = req.body.room || 'defaultRoom';
   try {
 
@@ -29,25 +30,26 @@ const createRoom = async (req, res) => {
     }).required()
 
     const params = validateSpec(serviceSpec, req.body);
+
     const storeRooms = await Rooms.create(
       { room: params.room, room_id: params.room_id, meta: params.meta || {} })
 
     if (!storeRooms) {
-      return res.status(400).json({ code: '01', message: String('Room already exists') })
+      return res.status(400).json({ code: responseCodes.error, message: 'Room already exists' })
     }
 
 
     sock.join(selectedRoom);
     sock.emit("success", "You have successful joined: " + selectedRoom);
-    // console.log('-->', sock)
-    console.log("Joining Room...: " + selectedRoom);
+
+
 
     return {
-      code: '00',
+      code: responseCodes.success,
       message: 'success hell yeah room has been created.',
-      url: process.env.BASEURL + `/api/v1` + `/join` + `?room_id=${params.room_id}&room=${params.room}`
+      url: `${process.env.BASEURL}/api/v1/join?room_id=${params.room_id}&room=${params.room}`
     }
- 
+
   } catch (e) {
     if (e.message.indexOf('room_1') >= 0) {
       e.message = 'Room already exist.';
@@ -55,8 +57,8 @@ const createRoom = async (req, res) => {
     if (e.message.indexOf('room_id_1') >= 0) {
       e.message = 'Room already exist.';
     }
-    sock.emit("err", "Room already exist " + selectedRoom);
-    return { code: '01', message: String(e.message) }
+    sock.emit('err', 'Room already exist' + selectedRoom);
+    return { code: responseCodes.error, message: e.message }
   }
 }
 module.exports = createRoom;

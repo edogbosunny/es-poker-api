@@ -9,11 +9,10 @@ const routes = require('./src/routes');
 const cors = require('cors');
 const io = require("socket.io")(http);
 const logger = require('./src/utils/logger');
-// require('./iofile')
 
 dotenv.config()
 
-// console.log('>>>', io.sockets.adapter.rooms)
+
 /**
  * connect to the db.
  * check joined rooms from socketio for incoming request.
@@ -38,11 +37,9 @@ try {
     socket.join('vroom');
     app.set("io", io);
     app.set("sock", socket);
-    // console.log('>>>', io.sockets.adapter)
+
     socket.on('vote', async (v) => {
       const rooms = io.sockets.adapter.rooms.get(v.room);
-      console.log(rooms)
-      console.log('v', v)
       if (!rooms) {
         socket.join(v.room);
         socket.emit("success", "You have successful joined: " + v.room);
@@ -51,12 +48,17 @@ try {
       let voteValidatorResponse = voteValidator(Number(v.vote))
       if (!voteValidatorResponse) {
 
+        io.emit("vote-status", {
+          // socket.to(v.room).emit("vote-status", {
+          message: "Vote has been recorderd successfully.",
+          response: respValue
+        })
         io.in(v.room).emit("vote-status", {
           message: "Vote must be prime number between 0 and 13",
         })
       }
       else {
-        console.log('--here3>')
+
         const fnd = await Rooms.find({ 'meta.data.name': v.name, room: v.room })
 
         if (!fnd || fnd.length === 0) {
@@ -65,7 +67,12 @@ try {
               $push: { 'meta.data': v }
             }, { new: true }
           )
-          console.log('--here2>')
+
+          io.emit("vote-status", {
+            // socket.to(v.room).emit("vote-status", {
+            message: "Vote has been recorderd successfully.",
+            response: respValue
+          })
           io.in(v.room).emit("vote-status", {
             message: "Vote has been recorderd successfully.",
             response: respValue
@@ -81,6 +88,11 @@ try {
             }, { new: true }
           )
 
+          io.emit("vote-status", {
+            // socket.to(v.room).emit("vote-status", {
+            message: "Vote has been recorderd successfully.",
+            response: respValue
+          })
           io.in(v.room).emit("vote-status", {
             // socket.to(v.room).emit("vote-status", {
             message: "Vote has been recorderd successfully.",
@@ -91,7 +103,7 @@ try {
     })
   })
 } catch (error) {
-  console.log(error)
+logger.error('An error has occoured')
 }
 
 app.use('*', (req, res) => res.status(404).json({
