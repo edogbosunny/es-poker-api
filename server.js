@@ -1,6 +1,7 @@
-// const http = require('.')
-import http from '.';
+const http = require('.');
+const logger = require('./src/utils/logger');
+const PORT = process.env.PORT || 3001;
 
-http.listen(3000, function () {
-  console.log("listening on *:3000");
+http.listen(PORT, function () {
+  logger.info(`Listening on port ${PORT}`);
 });
